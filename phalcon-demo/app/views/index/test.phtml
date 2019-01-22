@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>html5实现上传</title>
+    <style type="text/css">
+        .result{
+            width: 100px;
+            height:100px;
+            border:1px solid #eee;
+            display: inline-block;
+        }
+        .result img{
+            width: 100%;
+        }
+        input{
+            width: 70px;
+            margin-top: 10px;
+        }
+        @-moz-document url-prefix() { input { width:65px; } }/*单独对火狐进行设置*/
+    </style>
+</head>
+<body>
+
+<form action="" id="form1">
+    <div class="gs">
+        <input type="file" class="pic" name = 'pic' accept = "image/*" onchange="selectFile(this,event)" />
+        <div class="result"></div>
+    </div>
+    <div class="gs">
+        <input type="file" class="pic" name = 'pic' accept = "image/*" onchange="selectFile(this,event)" />
+        <div class="result"></div>
+    </div>
+    <div class="gs">
+        <input type="file" class="pic" name = 'pic' accept = "image/*" onchange="selectFile(this,event)" />
+        <div class="result"></div>
+    </div>
+</form>
+<!-- <button onclick = "handIn()">提交</button>-->
+<script src="/js/jquery.js"></script>
+<script type="text/javascript">
+    let form = new FormData();//通过HTML表单创建FormData对象
+    let url = '/index/upload';
+    let filename;
+
+    function selectFile(tag,e){
+        let files = e.currentTarget.files;
+        if(files.length == 0){
+            return;
+        }
+        let file = files[0];
+        //把上传的图片显示出来
+        let reader = new FileReader();
+        // 将文件以Data URL形式进行读入页面
+        reader.readAsBinaryString(file);
+        reader.onload = function(f){
+            //var index = $(tag).index();
+            let result = $(tag).next("div");
+            let src = "data:" + file.type + ";base64," + window.btoa(this.result);
+            result.html("<img src ='"+src+"'/>");
+        }
+        form.append('file',file);
+        //提交
+        let httpRequest;
+        //ie7+ 主流浏览器
+        if(window.XMLHttpRequest){
+            //alert("ie7+ 主流浏览器");
+            httpRequest = new XMLHttpRequest();
+        }else if(window.ActiveXObject){
+            //alert("ie7-");
+            httpRequest = new ActiveXObject("Microsoft.XMLHTTP");
+        }else{
+            alert("主流浏览器");
+        }
+        httpRequest.open("post","/index/upload",true);
+        //httpRequest.setRequestHeader("Content-Type","application/x-www-form-urlencoded;charset=utf-8");
+        httpRequest.send(form);
+        httpRequest.onreadystatechange =()=> {
+            // 信息已经返回，可以开始处理
+            if (httpRequest.readyState == 4) {
+                // 页面正常，可以开始处理信息
+                if (httpRequest.status == 200) {
+                    //let resdata = eval("("+httpRequest.responseText+")") ;
+                    //layer.msg(resdata.msg);
+                }
+            }
+        }
+    }
+
+</script>
+</body>
+</html>
